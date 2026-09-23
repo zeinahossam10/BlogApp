@@ -1,10 +1,31 @@
-import { Post } from "../entities/post.js";
+import { Post } from "../generated/prisma/client.js";
 
 export interface PostRepository {
-  create(post: Post): Post;
-  findAll(): Post[];
-  findById(id: string): Post | undefined
-  update(id: string, title: string, content: string): Post | undefined;
-  patch(id: string,title?: string,content?: string): Post | undefined;
-  delete(id:string): boolean
+    create(
+        title: string,
+        content: string,
+        userId: number
+    ): Promise<Post>;
+
+    findAll(): Promise<Post[]>;
+
+    findById(
+        id: number
+    ): Promise<Post | null>;
+
+    update(
+        id: number,
+        title: string,
+        content: string
+    ): Promise<Post | null>;
+
+    patch(
+        id: number,
+        title?: string,
+        content?: string
+    ): Promise<Post | null>;
+
+    delete(
+        id: number
+    ): Promise<boolean>;
 }
