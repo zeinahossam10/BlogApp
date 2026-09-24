@@ -5,6 +5,9 @@ import { PostService } from "../services/post_service.js";
 import { PrismaPostRepository } from "../repositories/prisma_post_repository.js";
 
 import { validate } from "../middleware/validate.js";
+import { asyncHandler } from "../middleware/async_handler.js";
+import { authenticate } from "../middleware/auth_middleware.js";
+
 import {
   createPostSchema,
   updatePostSchema,
@@ -19,35 +22,39 @@ const postController = new PostController(postService);
 
 router.post(
   "/",
+  authenticate,
   validate(createPostSchema),
-  postController.createPost
+  asyncHandler(postController.createPost)
 );
 
 router.get(
   "/",
-  postController.getPosts
+  asyncHandler(postController.getPosts)
 );
 
 router.get(
   "/:id",
-  postController.findPost
+  asyncHandler(postController.findPost)
 );
 
 router.put(
   "/:id",
+  authenticate,
   validate(updatePostSchema),
-  postController.updatePost
+  asyncHandler(postController.updatePost)
 );
 
 router.patch(
   "/:id",
+  authenticate,
   validate(patchPostSchema),
-  postController.patchPost
+  asyncHandler(postController.patchPost)
 );
 
 router.delete(
   "/:id",
-  postController.deletePost
+  authenticate,
+  asyncHandler(postController.deletePost)
 );
 
-export default router;
+export default router

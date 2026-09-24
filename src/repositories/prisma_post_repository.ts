@@ -1,6 +1,7 @@
 import { Post } from "../generated/prisma/client.js";
 import prisma from "../prisma/prisma_client.js";
 import { PostRepository } from "./post_repository.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 export class PrismaPostRepository implements PostRepository {
 
@@ -40,19 +41,20 @@ export class PrismaPostRepository implements PostRepository {
         title: string,
         content: string
     ): Promise<Post | null> {
-
         try {
             return await prisma.post.update({
-                where: {
-                    id,
-                },
-                data: {
-                    title,
-                    content,
-                },
+                where: { id },
+                data: { title, content },
             });
-        } catch {
-            return null;
+        } catch (error) {
+            if (
+                error instanceof Prisma.PrismaClientKnownRequestError &&
+                error.code === "P2025"
+            ) {
+                return null;
+            }
+
+            throw error;
         }
     }
 
@@ -61,36 +63,42 @@ export class PrismaPostRepository implements PostRepository {
         title?: string,
         content?: string
     ): Promise<Post | null> {
-
         try {
             return await prisma.post.update({
-                where: {
-                    id,
-                },
+                where: { id },
                 data: {
                     ...(title !== undefined && { title }),
                     ...(content !== undefined && { content }),
                 },
             });
-        } catch {
-            return null;
+        } catch (error) {
+            if (
+                error instanceof Prisma.PrismaClientKnownRequestError &&
+                error.code === "P2025"
+            ) {
+                return null;
+            }
+
+            throw error;
         }
     }
 
-    async delete(
-        id: number
-    ): Promise<boolean> {
-
+    async delete(id: number): Promise<boolean> {
         try {
             await prisma.post.delete({
-                where: {
-                    id,
-                },
+                where: { id }
             });
 
             return true;
-        } catch {
-            return false;
+        } catch (error) {
+            if (
+                error instanceof Prisma.PrismaClientKnownRequestError &&
+                error.code === "P2025"
+            ) {
+                return false;
+            }
+
+            throw error;
         }
     }
 }
